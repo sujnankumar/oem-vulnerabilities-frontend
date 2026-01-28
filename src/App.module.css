@@ -1,6 +1,7 @@
 .main-container {
-    padding: 0.5rem 3rem;
-    margin-top: 3rem;    
+    padding: 2rem 3rem;
     min-height: 100vh;
-    background-color: #edf4fc;
+    background-color: #f8f9fa;
+    margin-left: 5rem; /* Adjusted for 80px collapsed sidebar */
+    transition: margin-left 0.3s ease;
 }

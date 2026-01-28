@@ -19,11 +19,12 @@ const Login = () => {
       const response = await axiosInstance.post('/auth/login', { email, password });
       const { access_token, user } = response.data;
 
-      // Save the token in localStorage
+      // Save the token and user in localStorage
       localStorage.setItem('access_token', access_token);
+      localStorage.setItem('user', JSON.stringify(user));
 
-      // Navigate to the home page
-      navigate('/');
+      // Navigate to the dashboard page initially (or where the user was going)
+      navigate('/dashboard');
       console.log(`Welcome ${user.username}!`); // Optional: Debug or log the user data
     } catch (error) {
       setErrorMessage(error.response?.data?.error || 'Login failed. Please try again.');

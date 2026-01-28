@@ -1,8 +1,7 @@
-import { ChevronFirst, ChevronLast } from "lucide-react";
 import { createContext, useContext, useState } from "react";
 import { NavLink } from "react-router-dom";
 
-/* eslint-disable react/prop-types */ // TODO: upgrade to latest eslint tooling
+/* eslint-disable react/prop-types */
 
 const SidebarContext = createContext();
 
@@ -11,38 +10,38 @@ export default function Sidebar({ children }) {
 
   return (
     <>
-      {/* Overlay */}
+      {/* Minimal overlay */}
       {expanded && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40"
+          className="fixed inset-0 bg-black/40 z-40 lg:hidden"
           onClick={() => setExpanded(false)}
-        ></div>
+        />
       )}
 
       <aside
-        className={`fixed z-50 h-screen bg-navColor transition-all duration-300 ${
-          expanded ? "w-64" : "w-16"
+        className={`fixed z-50 h-screen bg-[#1a1d29] transition-all duration-300 border-r border-white/5 ${
+          expanded ? "w-64" : "w-20"
         }`}
       >
-        <nav className="h-full flex flex-col translate-y-14 text-gray-200 relative">
-          <div className="py-4 pb-2 flex justify-center p-2 items-center">
-            <span
-              className={`overflow-hidden transition-all ml-3 font-medium text-lightWhite ${
-                expanded ? "block" : "hidden"
-              }`}
-            >
-              Browse
-            </span>
-            <button
-              onClick={() => setExpanded((curr) => !curr)}
-              className={`p-1.5 rounded-lg ${expanded && "ml-auto"} hover:bg-darkGray text-lightWhite`}
-            >
-              {expanded ? <ChevronFirst size={20} /> : <ChevronLast size={20} />}
-            </button>
+        <nav className="h-full flex flex-col">
+          {/* Logo - Click to toggle */}
+          <div 
+            onClick={() => setExpanded((curr) => !curr)}
+            className="p-5 flex items-center justify-center cursor-pointer hover:bg-white/5 transition-colors border-b border-white/5"
+          >
+            <div className={`transition-all duration-300 ${expanded ? "w-48" : "w-10"}`}>
+              <img 
+                src="/logo.png" 
+                alt="Logo" 
+                className="w-full h-auto object-contain"
+              />
+            </div>
           </div>
 
           <SidebarContext.Provider value={{ expanded }}>
-            <ul className="flex-1 p-1">{children}</ul>
+            <ul className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+               {children}
+            </ul>
           </SidebarContext.Provider>
         </nav>
       </aside>
@@ -50,41 +49,51 @@ export default function Sidebar({ children }) {
   );
 }
 
-export function SidebarItem(props) {
+export function SidebarItem({ icon, text, location, onClick }) {
   const { expanded } = useContext(SidebarContext);
-  const [isActive, setIsActive] = useState(false);
+  
+  const content = (
+    <>
+      <div className="flex-shrink-0 w-5 h-5 flex items-center justify-center">
+        {icon}
+      </div>
+      <span
+        className={`text-sm font-medium whitespace-nowrap transition-all ${
+          expanded ? "ml-3 opacity-100 w-auto" : "ml-0 opacity-0 w-0 overflow-hidden"
+        }`}
+      >
+        {text}
+      </span>
+
+      {/* Minimal tooltip */}
+      {!expanded && (
+        <div className="absolute left-full ml-2 px-3 py-2 bg-[#2a2d3a] text-white text-xs font-medium rounded opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap shadow-lg border border-white/10">
+          {text}
+        </div>
+      )}
+    </>
+  );
+
+  const baseClasses = "relative flex items-center px-3 py-2.5 rounded-lg cursor-pointer transition-all group text-gray-400";
+  const hoverClasses = "hover:bg-white/5 hover:text-white";
+  const activeClasses = "bg-white/10 text-white";
+
+  if (onClick) {
+    return (
+      <button onClick={onClick} className={`w-full ${baseClasses} ${hoverClasses}`}>
+        {content}
+      </button>
+    );
+  }
 
   return (
     <NavLink
-      to={props.location}
+      to={location}
       className={({ isActive }) =>
-        isActive ? setIsActive(true) : setIsActive(false)
+        `${baseClasses} ${isActive ? activeClasses : hoverClasses}`
       }
     >
-      <li
-        className={`relative justify-center flex items-center py-2 px-3 my-1 font-normal rounded-md cursor-pointer transition-colors group ${
-          isActive
-            ? "bg-purpleLogo text-white bg-[rgb(145,71,255)]"
-            : "hover:bg-darkGray text-lightWhite"
-        }`}
-      >
-        {props.icon}
-        <span
-          className={`overflow-hidden transition-all text-sm text-nowrap ${
-            expanded ? "w-40 ml-3" : "hidden"
-          }`}
-        >
-          {props.text}
-        </span>
-
-        {!expanded && (
-          <div
-            className={`absolute z-30 left-full rounded-md px-2 py-1 ml-6 bg-indigo-100 text-indigo-800 text-sm invisible opacity-20 -translate-x-3 transition-all group-hover:visible group-hover:opacity-100 group-hover:translate-x-0`}
-          >
-            {props.text}
-          </div>
-        )}
-      </li>
+      {content}
     </NavLink>
   );
 }
